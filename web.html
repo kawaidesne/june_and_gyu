@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>record_book</title>
+    <script src="https://cdn.socket.io/4.4.0/socket.io.min.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const socket = io();
+
+            // 데이터 업데이트 수신 핸들러
+            socket.on('update_data', (data) => {
+                const tableBody = document.getElementById('data-table-body');
+                tableBody.innerHTML = ''; // 기존 테이블 내용을 비웁니다
+                data.data.forEach(row => {
+                    const rowElement = document.createElement('tr');
+                    row.forEach(cell => {
+                        const cellElement = document.createElement('td');
+                        cellElement.textContent = cell;
+                        rowElement.appendChild(cellElement);
+                    });
+                    tableBody.appendChild(rowElement);
+                });
+            });
+
+            // 서버에 데이터 업데이트 요청
+            function requestUpdate() {
+                socket.emit('request_update');
+            }
+
+            // 주기적으로 데이터 업데이트 요청
+            setInterval(requestUpdate, 5000); // 5초마다 데이터 요청
+        });
+    </script>
+</head>
+<body>
+    <h1>출퇴근 명부 {{current_time}}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Value</th>
+                <th>Value2</th>
+            </tr>
+        </thead>
+        <tbody id="data-table-body">
+            <!-- 데이터 행이 여기에 추가됩니다 -->
+        </tbody>
+    </table>
+</body>
+</html>
